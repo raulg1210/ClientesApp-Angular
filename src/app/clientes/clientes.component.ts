@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { Cliente } from './cliente';
 import { ClienteService } from './cliente.service';
+import swal from 'sweetalert2';
 
 @Component({
   selector: 'app-clientes',
   templateUrl: './clientes.component.html'
 })
 export class ClientesComponent {
-  clientes: Cliente[] | undefined;
+  clientes!: Cliente[];
 
   //
   constructor(private clienteService: ClienteService) { }
@@ -23,4 +24,38 @@ export class ClientesComponent {
       clientes => this.clientes = clientes
     );
   }
+
+  //creamos el metodo delete en el formulario ya que va a ser como un eventi del mismo
+  //al metodo le pasamos un cliente y usamos la libreria sweet alert para dar estilos
+  //despues pasamos el resultado y si tiene valor eliminamos al cliente y volvemos a mostrar la lista
+  //sin el cliente eliminado y mostramos un feedback
+  delete(cliente: Cliente): void{
+    swal({
+      title: `¿Estás seguro de eliminar al cliente ${cliente.nombre} ${cliente.apellido}?`,
+      text: 'No se podrá revertir',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3045d6',
+      confirmButtonText: 'Sí, deseo eliminarlo',
+      cancelButtonText: 'No, cancelar',
+      confirmButtonClass: 'btn btn-success',
+      cancelButtonClass: 'btn btn-danger',
+      buttonsStyling: false,
+      reverseButtons: true
+    }).then((result) => {
+      if(result.value){
+        this.clienteService.delete(cliente.id).subscribe(
+          response => {
+            this.clientes = this.clientes?.filter(cli => cli !== cliente)
+            swal(
+              'Eliminado',
+              `El cliente ${cliente.nombre} ${cliente.apellido} ha sido eliminado`,
+              'success'
+            )
+          }
+        )
+      } 
+    })
+  }
+
 }

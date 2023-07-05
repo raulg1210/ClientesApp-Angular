@@ -27,4 +27,20 @@ export class ClienteService {
     return this.http.post<Cliente>(this.urlEndPoint, cliente, {headers: this.httpHeaders})
   }
 
+  getCliente(id: number) : Observable<Cliente>{
+    return this.http.get<Cliente>(`${this.urlEndPoint}/${id}`)
+  }
+
+  //creamos el metodo update que retorna un cliente al que le pasamos para modificar la url con el id
+  //del cliente para saber cual es, el objeto cliente para modificarlo y las cabeceras para ver
+  //las respuestas que da
+  update(cliente: Cliente) : Observable<Cliente>{
+    return this.http.put<Cliente>(`${this.urlEndPoint}/${cliente.id}`, cliente, {headers: this.httpHeaders})
+  }
+
+
+  delete(id: number) : Observable<Cliente>{
+    return this.http.delete<Cliente>(`${this.urlEndPoint}/${id}`, {headers: this.httpHeaders})
+  }
+
 }
