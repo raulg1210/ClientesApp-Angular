@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Cliente } from './cliente';
 import { CLIENTES } from './clientes.json';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
+import swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +14,8 @@ export class ClienteService {
   private urlEndPoint: string = 'http://localhost:8080/api/clientes';
   private httpHeaders = new HttpHeaders({'Content-type': 'application/json'})
 
-  constructor(private http:HttpClient) { }
+  //al constructor le pasamos dos parametros, uno para los encabezados y otro para las rutas con sus clases
+  constructor(private http:HttpClient, private router: Router) { }
 
   //al ser un servicio aqui es donde creamos los metodos, en este caso getClientes nos devuelve los clientes
   getClientes(): Observable<Cliente[]> {
@@ -27,8 +30,17 @@ export class ClienteService {
     return this.http.post<Cliente>(this.urlEndPoint, cliente, {headers: this.httpHeaders})
   }
 
+  //añadimos la funcion pipe de observable a la que vamos a manejar los errores con catchError importado
+  //anteriormente
   getCliente(id: number) : Observable<Cliente>{
-    return this.http.get<Cliente>(`${this.urlEndPoint}/${id}`)
+    return this.http.get<Cliente>(`${this.urlEndPoint}/${id}`).pipe(
+      catchError(e => {
+        this.router.navigate(["/clientes"]);
+        console.error(e.error.mensaj)
+        swal('Error al editar', e.error.mensaje, 'error');
+        return throwError(e);
+      })
+    );
   }
 
   //creamos el metodo update que retorna un cliente al que le pasamos para modificar la url con el id
