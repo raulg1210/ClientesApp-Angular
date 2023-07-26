@@ -25,9 +25,9 @@ export class FormComponent {
     console.log('Clicked!');
     console.log(this.cliente);
     this.clienteService.create(this.cliente).subscribe(
-      clientes => {
+      cliente => {
         this.router.navigate(['/clientes'])
-        swal('Nuevo Cliente', `Cliente ${this.cliente.nombre} creado con éxito`, 'success');
+        swal('Nuevo Cliente', `El cliente ${cliente.nombre} creado con éxito`, 'success');
       }
     );
   }
@@ -47,8 +47,10 @@ export class FormComponent {
   //y mostramos la alerta con la libreria sweetalert
   public update(): void{
     this.clienteService.update(this.cliente)
-      .subscribe(cliente => this.router.navigate(['/clientes']))
-      swal('Cliente Actualizado', `Cliente ${this.cliente.nombre} actualizado con éxito`, 'success');
+      .subscribe(json => {
+        this.router.navigate(['/clientes'])
+        swal('Cliente Actualizado', `${json.mensaje}: ${json.cliente.mensaje}`, 'success');
+    })
   }
 
 

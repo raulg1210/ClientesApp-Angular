@@ -27,7 +27,15 @@ export class ClienteService {
   //en el return cogemos el encabezado http y al crearlo ocultamos los datos con post y devolvemos un cliente
   //tipo observable
   create(cliente: Cliente) : Observable<Cliente>{
-    return this.http.post<Cliente>(this.urlEndPoint, cliente, {headers: this.httpHeaders})
+    return this.http.post(this.urlEndPoint, cliente, {headers: this.httpHeaders}).pipe(
+      //mapeamos la respuesta y la ponemos de tipo cliente  
+      map((response: any) => response.cliente as Cliente),
+      catchError(e => {
+        console.error(e.error.mensaje)
+        swal(e.error.mensaje, e.error.error, 'error');
+        return throwError(e);
+      })
+    )
   }
 
   //añadimos la funcion pipe de observable a la que vamos a manejar los errores con catchError importado
@@ -36,7 +44,7 @@ export class ClienteService {
     return this.http.get<Cliente>(`${this.urlEndPoint}/${id}`).pipe(
       catchError(e => {
         this.router.navigate(["/clientes"]);
-        console.error(e.error.mensaj)
+        console.error(e.error.mensaje)
         swal('Error al editar', e.error.mensaje, 'error');
         return throwError(e);
       })
@@ -46,13 +54,25 @@ export class ClienteService {
   //creamos el metodo update que retorna un cliente al que le pasamos para modificar la url con el id
   //del cliente para saber cual es, el objeto cliente para modificarlo y las cabeceras para ver
   //las respuestas que da
-  update(cliente: Cliente) : Observable<Cliente>{
-    return this.http.put<Cliente>(`${this.urlEndPoint}/${cliente.id}`, cliente, {headers: this.httpHeaders})
+  update(cliente: Cliente) : Observable<any>{
+    return this.http.put<any>(`${this.urlEndPoint}/${cliente.id}`, cliente, {headers: this.httpHeaders}).pipe(
+      catchError(e => {
+        console.error(e.error.mensaje)
+        swal(e.error.mensaje, e.error.error, 'error');
+        return throwError(e);
+      })
+    )
   }
 
 
   delete(id: number) : Observable<Cliente>{
-    return this.http.delete<Cliente>(`${this.urlEndPoint}/${id}`, {headers: this.httpHeaders})
+    return this.http.delete<Cliente>(`${this.urlEndPoint}/${id}`, {headers: this.httpHeaders}).pipe(
+      catchError(e => {
+        console.error(e.error.mensaje)
+        swal(e.error.mensaje, e.error.error, 'error');
+        return throwError(e);
+      })
+    )
   }
 
 }
