@@ -12,6 +12,7 @@ import swal from 'sweetalert2';
 export class FormComponent {
   public cliente:Cliente = new Cliente()
   public titulo:string = "Crear Cliente"
+  public errores:string[] | undefined;
 
   constructor(private clienteService: ClienteService, private router: Router,
     private activatedRoute: ActivatedRoute){}
@@ -28,6 +29,14 @@ export class FormComponent {
       cliente => {
         this.router.navigate(['/clientes'])
         swal('Nuevo Cliente', `El cliente ${cliente.nombre} creado con éxito`, 'success');
+      },
+      //una vez creado la constante errores arriba le pasamos un error como funcion lambda en el cual vamos a recoger los errores del backend en la variable creada
+      //para ello vamos sacando los atributos de err y lo transformamos en un string
+      //mostramos en la consola los errores y el status
+      err => {
+        this.errores = err.error.errors as string[];
+        console.error(err.error.errors);
+        console.error('Código de error desde el backend '+ err.status)
       }
     );
   }
@@ -50,7 +59,16 @@ export class FormComponent {
       .subscribe(json => {
         this.router.navigate(['/clientes'])
         swal('Cliente Actualizado', `${json.mensaje}: ${json.cliente.mensaje}`, 'success');
-    })
+      },
+      //una vez creado la constante errores arriba le pasamos un error como funcion lambda en el cual vamos a recoger los errores del backend en la variable creada
+      //para ello vamos sacando los atributos de err y lo transformamos en un string
+      //mostramos en la consola los errores y el status
+      err => {
+        this.errores = err.error.errors as string[];
+        console.error(err.error.errors);
+        console.error('Código de error desde el backend '+ err.status)
+      }
+    )
   }
 
 
